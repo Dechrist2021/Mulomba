@@ -9,6 +9,7 @@ import time
 import pandas as pd
 from datetime import datetime
 import base64
+import os
 
 # ==============================================
 # Beautiful UI Setup
@@ -89,16 +90,29 @@ st.markdown("Extract all reviews from any Google Maps location with one click.")
 # ==============================================
 # Core Functionality (Your Working Code)
 # ==============================================
+def get_driver():
+    if os.path.exists('/app/.apt/usr/bin/google-chrome'):
+        # Streamlit Cloud config
+        chrome_options = Options()
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--headless')
+        chrome_options.binary_location = '/app/.apt/usr/bin/google-chrome'
+        service = Service(executable_path='/app/.apt/usr/bin/chromedriver')
+        return webdriver.Chrome(service=service, options=chrome_options)
+    else:
+        # Local config (your existing setup)
+        options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--disable-gpu")
+        service = Service("C:/Users/user/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe")  # Your local path
+        return webdriver.Chrome(service=service, options=options)
+
 if 'reviews' not in st.session_state:
     st.session_state.reviews = None
 
 def scrape_reviews(url):
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--disable-gpu")
-    service = Service("C:/Users/user/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe")
-    
-    driver = webdriver.Chrome(service=service, options=options)
+    driver = get_driver()  # This now handles both local and cloud config
     
     try:
         # Update progress
@@ -224,12 +238,22 @@ if scrape_btn and url:
             status_text.text("")
 
 # Reset button
+# ==============================================
+# Clear Results Button (Fixed Version)
+# ==============================================
 if st.session_state.reviews is not None:
     if st.button("🔄 Clear Results"):
         st.session_state.reviews = None
         progress_bar.progress(0)
         status_text.text("")
-        st.experimental_rerun()
+        
+        # Add a small delay and success message
+        with st.spinner("Clearing data..."):
+            time.sleep(0.5)
+        st.success("Data cleared successfully!")
+        
+        # Modern rerun approach
+        st.rerun()
 
 # ==============================================
 # Help Section
