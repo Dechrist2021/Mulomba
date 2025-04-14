@@ -91,21 +91,39 @@ st.markdown("Extract all reviews from any Google Maps location with one click.")
 # Core Functionality (Your Working Code)
 # ==============================================
 def get_driver():
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.service import Service
+    import os
+    
     if os.path.exists('/app/.apt/usr/bin/google-chrome'):
-        # Streamlit Cloud config
+        # Streamlit Cloud config (updated with improvements)
         chrome_options = Options()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--window-size=1920,1080')
         chrome_options.binary_location = '/app/.apt/usr/bin/google-chrome'
         service = Service(executable_path='/app/.apt/usr/bin/chromedriver')
         return webdriver.Chrome(service=service, options=chrome_options)
     else:
-        # Local config (your existing setup)
+        # Local config (improved version)
         options = Options()
         options.add_argument("--headless")
         options.add_argument("--disable-gpu")
-        service = Service("C:/Users/user/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe")  # Your local path
+        options.add_argument("--no-sandbox")  # Added for consistency
+        options.add_argument("--window-size=1920,1080")  # Added
+        
+        # Use webdriver-manager for automatic chromedriver management
+        try:
+            from webdriver_manager.chrome import ChromeDriverManager
+            service = Service(ChromeDriverManager().install())
+        except:
+            # Fallback to your local path if webdriver_manager fails
+            local_path = "C:/Users/user/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe"
+            service = Service(executable_path=local_path)
+            
         return webdriver.Chrome(service=service, options=options)
 
 if 'reviews' not in st.session_state:
