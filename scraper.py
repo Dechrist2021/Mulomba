@@ -95,36 +95,32 @@ def get_driver():
     from selenium.webdriver.chrome.options import Options
     from selenium.webdriver.chrome.service import Service
     import os
-    
-    if os.path.exists('/app/.apt/usr/bin/google-chrome'):
-        # Streamlit Cloud config (updated with improvements)
-        chrome_options = Options()
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--window-size=1920,1080')
-        chrome_options.binary_location = '/app/.apt/usr/bin/google-chrome'
-        service = Service(executable_path='/app/.apt/usr/bin/chromedriver')
-        return webdriver.Chrome(service=service, options=chrome_options)
+
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+
+    # Streamlit Cloud configuration
+    if os.path.exists('/usr/bin/chromedriver'):
+        # Using system-installed Chrome and Chromedriver
+        chrome_options.binary_location = '/usr/bin/google-chrome'
+        service = Service(executable_path='/usr/bin/chromedriver')
     else:
-        # Local config (improved version)
-        options = Options()
-        options.add_argument("--headless")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")  # Added for consistency
-        options.add_argument("--window-size=1920,1080")  # Added
-        
-        # Use webdriver-manager for automatic chromedriver management
+        # Local development configuration
         try:
             from webdriver_manager.chrome import ChromeDriverManager
             service = Service(ChromeDriverManager().install())
         except:
-            # Fallback to your local path if webdriver_manager fails
+            # Fallback for local testing with specific path
             local_path = "C:/Users/user/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe"
             service = Service(executable_path=local_path)
-            
-        return webdriver.Chrome(service=service, options=options)
+
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    return driver
 
 if 'reviews' not in st.session_state:
     st.session_state.reviews = None
