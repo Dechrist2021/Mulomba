@@ -103,11 +103,12 @@ def get_driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920x1080")
 
-    # For Streamlit Cloud
+    # Streamlit Cloud paths (from setup.sh)
     if os.path.exists('/usr/bin/chromedriver'):
+        chrome_options.binary_location = '/usr/bin/google-chrome'
         service = Service('/usr/bin/chromedriver')
     else:
-        # Local fallback
+        # Local fallback (Windows/Mac)
         from webdriver_manager.chrome import ChromeDriverManager
         service = Service(ChromeDriverManager().install())
 
