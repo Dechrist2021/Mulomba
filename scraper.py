@@ -101,26 +101,17 @@ def get_driver():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--window-size=1920x1080")
 
-    # Streamlit Cloud configuration
+    # For Streamlit Cloud
     if os.path.exists('/usr/bin/chromedriver'):
-        # Using system-installed Chrome and Chromedriver
-        chrome_options.binary_location = '/usr/bin/google-chrome'
-        service = Service(executable_path='/usr/bin/chromedriver')
+        service = Service('/usr/bin/chromedriver')
     else:
-        # Local development configuration
-        try:
-            from webdriver_manager.chrome import ChromeDriverManager
-            service = Service(ChromeDriverManager().install())
-        except:
-            # Fallback for local testing with specific path
-            local_path = "C:/Users/user/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe"
-            service = Service(executable_path=local_path)
+        # Local fallback
+        from webdriver_manager.chrome import ChromeDriverManager
+        service = Service(ChromeDriverManager().install())
 
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    return driver
+    return webdriver.Chrome(service=service, options=chrome_options)
 
 if 'reviews' not in st.session_state:
     st.session_state.reviews = None
