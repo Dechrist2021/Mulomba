@@ -83,7 +83,7 @@ st.markdown("""
 # ==============================================
 # App Header
 # ==============================================
-st.image("https://maps.gstatic.com/tactile/images/maps_logo_grayscale-4b0a256a.png", width=150)
+#st.image("https://maps.gstatic.com/tactile/images/maps_logo_grayscale-4b0a256a.png", width=150)
 st.title("🗺️ Hotels Reviews Scraper")
 st.markdown("Extract all reviews from any Google Maps location with one click.")
 
